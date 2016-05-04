@@ -12,6 +12,7 @@
 		143D3F4C1CD9810E00025642 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 143D3F4A1CD9810E00025642 /* Main.storyboard */; };
 		143D3F4E1CD9810E00025642 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 143D3F4D1CD9810E00025642 /* Assets.xcassets */; };
 		143D3F511CD9810E00025642 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 143D3F4F1CD9810E00025642 /* LaunchScreen.storyboard */; };
+		146216331CD990C300629924 /* FollowButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146216321CD990C300629924 /* FollowButton.swift */; };
 		6FFE1C9C8F4162657440887E /* Pods_FollowButtonConcept.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BFB75E9F2A041DF349EB577 /* Pods_FollowButtonConcept.framework */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +24,7 @@
 		143D3F4D1CD9810E00025642 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		143D3F501CD9810E00025642 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		143D3F521CD9810E00025642 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		146216321CD990C300629924 /* FollowButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FollowButton.swift; sourceTree = "<group>"; };
 		347725A1DB4A03F4B8DCADD7 /* Pods-FollowButtonConcept.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FollowButtonConcept.release.xcconfig"; path = "Pods/Target Support Files/Pods-FollowButtonConcept/Pods-FollowButtonConcept.release.xcconfig"; sourceTree = "<group>"; };
 		5BFB75E9F2A041DF349EB577 /* Pods_FollowButtonConcept.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FollowButtonConcept.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA92652BA9F488C9795604E3 /* Pods-FollowButtonConcept.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FollowButtonConcept.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FollowButtonConcept/Pods-FollowButtonConcept.debug.xcconfig"; sourceTree = "<group>"; };
@@ -63,6 +65,7 @@
 			children = (
 				143D3F461CD9810E00025642 /* AppDelegate.swift */,
 				143D3F481CD9810E00025642 /* ProfileViewController.swift */,
+				146216321CD990C300629924 /* FollowButton.swift */,
 				143D3F4A1CD9810E00025642 /* Main.storyboard */,
 				143D3F4D1CD9810E00025642 /* Assets.xcassets */,
 				143D3F4F1CD9810E00025642 /* LaunchScreen.storyboard */,
@@ -212,6 +215,7 @@
 			files = (
 				143D3F491CD9810E00025642 /* ProfileViewController.swift in Sources */,
 				143D3F471CD9810E00025642 /* AppDelegate.swift in Sources */,
+				146216331CD990C300629924 /* FollowButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
