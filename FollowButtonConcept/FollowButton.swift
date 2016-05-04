@@ -9,8 +9,20 @@
 import UIKit
 import SnapKit
 
+protocol FollowButtonDelegate: class {
+  func handleFollowButtonPress(action: (()->Void))
+}
+
 internal class FollowButton: UIView {
+
+  // MARK: - Variables
+  // ------------------------------------------------------------
+  internal var delegate: FollowButtonDelegate?
+  private var loadingStateWidthConstraints: (left: Constraint?, right: Constraint?)
+  private var normalStateWidthConstraint: (left: Constraint?, right: Constraint?)
   
+  // MARK: - Initialization
+  // ------------------------------------------------------------
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -21,11 +33,10 @@ internal class FollowButton: UIView {
   required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
   }
+
   
-  internal func tappedFollow(sender: AnyObject) {
-    print("tapped follow")
-  }
-  
+  // MARK: - Layout Setup
+  // ------------------------------------------------------------
   internal func updateCornerRadius() {
     self.layoutIfNeeded()
     
@@ -43,8 +54,9 @@ internal class FollowButton: UIView {
     self.buttonLabel.snp_makeConstraints { (make) -> Void in
       make.top.equalTo(buttonView).offset(14.0)
       make.bottom.equalTo(buttonView).inset(14.0)
-      make.right.equalTo(buttonView).inset(36.0)
-      make.left.equalTo(buttonView).offset(36.0)
+      let right: Constraint = make.right.equalTo(buttonView).inset(48.0).constraint
+      let left: Constraint = make.left.equalTo(buttonView).offset(48.0).constraint
+      self.loadingStateWidthConstraints = (left, right)
     }
   }
   
@@ -53,6 +65,9 @@ internal class FollowButton: UIView {
     self.buttonView.addSubview(buttonLabel)
   }
   
+  
+  // MARK: - Lazy Instances
+  // ------------------------------------------------------------
   lazy var buttonView: UIControl = {
     let control: UIControl = UIControl()
     control.backgroundColor = UIColor.whiteColor()
@@ -73,12 +88,54 @@ internal class FollowButton: UIView {
     return label
   }()
   
+  
+  // MARK: - Animations
+  // ------------------------------------------------------------
+  private func startButtonLoadingAnimation() {
+    
+    let currentHeight: CGFloat = self.frame.size.height
+    self.loadingStateWidthConstraints.left?.deactivate()
+    self.loadingStateWidthConstraints.right?.deactivate()
+    
+    self.buttonLabel.snp_makeConstraints { (make) -> Void in
+      make.center.equalTo(self.buttonView).priorityRequired()
+      self.loadingStateWidthConstraints.left = make.left.lessThanOrEqualTo(self.buttonView).constraint
+      self.loadingStateWidthConstraints.right = make.right.greaterThanOrEqualTo(self.buttonView).constraint
+    }
+    
+    self.buttonView.snp_remakeConstraints { (make) -> Void in
+      make.edges.equalTo(self)
+      make.width.height.equalTo(currentHeight)
+    }
+    
+    UIView.animateKeyframesWithDuration(0.55, delay: 0.0, options: [.LayoutSubviews, .CalculationModePaced], animations: { () -> Void in
+      self.buttonLabel.alpha = 1.0
+      
+      UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.2, animations: { () -> Void in
+        self.buttonLabel.alpha = 0.0
+      })
+      
+      self.layoutIfNeeded()
+      }) { (complete: Bool) -> Void in
+        if complete {
+          
+        }
+    }
+    
+  }
+  
+  private func attachStretchAnimationToButton() {
+    
+  }
+  
   // MARK: - Button Control Actions
+  // ------------------------------------------------------------
   internal func followButtonTapped(sender: AnyObject?) {
     print("follow button tapped")
     self.buttonLabel.textColor = ConceptColors.DarkText
     
     // TODO: animation
+    self.startButtonLoadingAnimation()
   }
   
   internal func followButtonHighlighted(sender: AnyObject?) {
