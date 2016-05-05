@@ -175,13 +175,11 @@ internal class FollowButton: UIView {
   
   internal func attachRotationAnimationToSpinner() {
     
-    let rotationTransform: CGAffineTransform = CGAffineTransformMakeRotation(CGFloat(M_PI_2))
-    UIView.animateWithDuration(0.55, delay: 0.2, options: [.Repeat, .BeginFromCurrentState], animations: { () -> Void in
-      self.spinnerImageView.transform = rotationTransform
+    let rotationTransform = CGAffineTransformMakeRotation((CGFloat(180.0 * M_PI) / 180.0))
+    
+    UIView.animateWithDuration(0.55, delay: 0.2, options: [.CurveLinear], animations: { () -> Void in
+      self.spinnerImageView.layer.transform = CATransform3DMakeAffineTransform(rotationTransform)
       }) { (complete: Bool) -> Void in
-        if complete {
-          
-        }
     }
     
   }
