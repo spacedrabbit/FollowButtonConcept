@@ -105,7 +105,7 @@ internal class FollowButton: UIView {
       make.width.greaterThanOrEqualTo(currentHeight)
     }
     
-    UIView.animateKeyframesWithDuration(0.55, delay: 0.0, options: [.LayoutSubviews, .CalculationModePaced], animations: { () -> Void in
+    UIView.animateKeyframesWithDuration(0.40, delay: 0.0, options: [], animations: { () -> Void in
       self.buttonLabel.alpha = 1.0
       
       UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.2, animations: { () -> Void in
@@ -128,15 +128,17 @@ internal class FollowButton: UIView {
   }
   
   internal func attachStretchAnimationToButton() {
+    self.buttonLabel.text = "F O L L O W I N G"
 
     self.loadingStateWidthConstraints.left?.activate()
     self.loadingStateWidthConstraints.right?.activate()
-    UIView.animateKeyframesWithDuration(0.55, delay: 0.0, options: [.LayoutSubviews, .CalculationModePaced], animations: { () -> Void in
+    UIView.animateKeyframesWithDuration(0.25, delay: 0.0, options: [], animations: { () -> Void in
       
       self.buttonLabel.alpha = 0.0
-      
       UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.3, animations: { () -> Void in
         self.buttonLabel.alpha = 1.0
+        self.buttonView.backgroundColor = ConceptColors.MediumBlue
+        self.buttonLabel.textColor = ConceptColors.OffWhite
       })
       
         self.layoutIfNeeded()
@@ -156,7 +158,6 @@ internal class FollowButton: UIView {
     print("follow button tapped")
     self.buttonLabel.textColor = ConceptColors.DarkText
     
-    // TODO: animation
     self.startButtonLoadingAnimation()
   }
   
