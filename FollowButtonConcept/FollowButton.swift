@@ -58,17 +58,23 @@ internal class FollowButton: UIView {
       let left: Constraint = make.left.equalTo(buttonView).offset(48.0).constraint
       self.loadingStateWidthConstraints = (left, right)
     }
+    
+    self.spinnerImageView.snp_makeConstraints { (make) -> Void in
+      make.center.equalTo(self.buttonView)
+      make.height.width.equalTo(36.0)
+    }
   }
   
   internal func setupViewHierarchy() {
     self.addSubview(buttonView)
     self.buttonView.addSubview(buttonLabel)
+    self.buttonView.addSubview(spinnerImageView)
   }
   
   
   // MARK: - Lazy Instances
   // ------------------------------------------------------------
-  lazy var buttonView: UIControl = {
+  internal lazy var buttonView: UIControl = {
     let control: UIControl = UIControl()
     control.backgroundColor = UIColor.whiteColor()
     control.layer.cornerRadius = 15.0
@@ -86,6 +92,13 @@ internal class FollowButton: UIView {
     label.font = UIFont.systemFontOfSize(16.0, weight: UIFontWeightMedium)
     label.text = "F O L L O W"
     return label
+  }()
+  
+  lazy var spinnerImageView: UIImageView = {
+    let imageView: UIImageView = UIImageView(image: UIImage(named: "thick_spinner"))
+    imageView.contentMode = .ScaleAspectFit
+    imageView.alpha = 0.0
+    return imageView
   }()
   
   
@@ -107,21 +120,27 @@ internal class FollowButton: UIView {
     
     UIView.animateKeyframesWithDuration(0.40, delay: 0.0, options: [], animations: { () -> Void in
       self.buttonLabel.alpha = 1.0
+      self.spinnerImageView.alpha = 0.0
       
       UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.2, animations: { () -> Void in
         self.buttonLabel.alpha = 0.0
+      })
+      
+      UIView.addKeyframeWithRelativeStartTime(0.5, relativeDuration: 0.5, animations: { () -> Void in
+        self.spinnerImageView.alpha = 1.0
       })
       
       self.layoutIfNeeded()
       }) { (complete: Bool) -> Void in
         if complete {
           self.startReverseTimer()
+          self.attachRotationAnimationToSpinner()
         }
     }
   }
   
   private func startReverseTimer() {
-    let aLittleLater: NSDate = NSDate(timeIntervalSinceNow: 1.0)
+    let aLittleLater: NSDate = NSDate(timeIntervalSinceNow: 2.2)
     let timer: NSTimer = NSTimer(fireDate: aLittleLater, interval: 0.0, target: self, selector: "attachStretchAnimationToButton", userInfo: nil, repeats: false)
     let timerRunLoop: NSRunLoop = NSRunLoop.currentRunLoop()
     timerRunLoop.addTimer(timer, forMode: NSDefaultRunLoopMode)
@@ -141,6 +160,10 @@ internal class FollowButton: UIView {
         self.buttonLabel.textColor = ConceptColors.OffWhite
       })
       
+      UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.2, animations: { () -> Void in
+        self.spinnerImageView.alpha = 0.0
+      })
+      
         self.layoutIfNeeded()
       }) { (complete: Bool) -> Void in
         if complete {
@@ -149,7 +172,19 @@ internal class FollowButton: UIView {
     }
     
   }
-
+  
+  internal func attachRotationAnimationToSpinner() {
+    
+    let rotationTransform: CGAffineTransform = CGAffineTransformMakeRotation(CGFloat(M_PI_2))
+    UIView.animateWithDuration(0.55, delay: 0.2, options: [.Repeat, .BeginFromCurrentState], animations: { () -> Void in
+      self.spinnerImageView.transform = rotationTransform
+      }) { (complete: Bool) -> Void in
+        if complete {
+          
+        }
+    }
+    
+  }
   
   
   // MARK: - Button Control Actions
