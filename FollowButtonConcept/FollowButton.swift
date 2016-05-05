@@ -99,13 +99,10 @@ internal class FollowButton: UIView {
     
     self.buttonLabel.snp_makeConstraints { (make) -> Void in
       make.center.equalTo(self.buttonView).priorityRequired()
-      self.loadingStateWidthConstraints.left = make.left.lessThanOrEqualTo(self.buttonView).constraint
-      self.loadingStateWidthConstraints.right = make.right.greaterThanOrEqualTo(self.buttonView).constraint
     }
     
-    self.buttonView.snp_remakeConstraints { (make) -> Void in
-      make.edges.equalTo(self)
-      make.width.height.equalTo(currentHeight)
+    self.buttonView.snp_updateConstraints { (make) -> Void in
+      make.width.greaterThanOrEqualTo(currentHeight)
     }
     
     UIView.animateKeyframesWithDuration(0.55, delay: 0.0, options: [.LayoutSubviews, .CalculationModePaced], animations: { () -> Void in
@@ -118,15 +115,40 @@ internal class FollowButton: UIView {
       self.layoutIfNeeded()
       }) { (complete: Bool) -> Void in
         if complete {
+          self.startReverseTimer()
+        }
+    }
+  }
+  
+  private func startReverseTimer() {
+    let aLittleLater: NSDate = NSDate(timeIntervalSinceNow: 1.0)
+    let timer: NSTimer = NSTimer(fireDate: aLittleLater, interval: 0.0, target: self, selector: "attachStretchAnimationToButton", userInfo: nil, repeats: false)
+    let timerRunLoop: NSRunLoop = NSRunLoop.currentRunLoop()
+    timerRunLoop.addTimer(timer, forMode: NSDefaultRunLoopMode)
+  }
+  
+  internal func attachStretchAnimationToButton() {
+
+    self.loadingStateWidthConstraints.left?.activate()
+    self.loadingStateWidthConstraints.right?.activate()
+    UIView.animateKeyframesWithDuration(0.55, delay: 0.0, options: [.LayoutSubviews, .CalculationModePaced], animations: { () -> Void in
+      
+      self.buttonLabel.alpha = 0.0
+      
+      UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.3, animations: { () -> Void in
+        self.buttonLabel.alpha = 1.0
+      })
+      
+        self.layoutIfNeeded()
+      }) { (complete: Bool) -> Void in
+        if complete {
           
         }
     }
     
   }
+
   
-  private func attachStretchAnimationToButton() {
-    
-  }
   
   // MARK: - Button Control Actions
   // ------------------------------------------------------------

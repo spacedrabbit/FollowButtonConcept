@@ -29,19 +29,37 @@ class ProfileViewController: UIViewController {
   override func viewWillAppear(animated: Bool) {
     super.viewWillAppear(animated)
     self.followButton.updateCornerRadius()
+    self.drawGradientIn(self.profileTopSectionView)
   }
   
-  override func didReceiveMemoryWarning() {
-    super.didReceiveMemoryWarning()
+  // MARK: - UI Updates
+  // ------------------------------------------------------------
+  internal func drawGradientIn(view: UIView) {
+    self.view.layoutIfNeeded()
     
+    let gradientLayer: CAGradientLayer = CAGradientLayer()
+    gradientLayer.frame = view.bounds
+    gradientLayer.colors = [ConceptColors.LightBlue.CGColor, ConceptColors.MediumBlue.CGColor]
+    gradientLayer.locations = [0.0, 1.0]
+    gradientLayer.startPoint = CGPointMake(0.0, 0.0)
+    gradientLayer.endPoint = CGPointMake(1.0, 1.0)
+    
+    view.layer.addSublayer(gradientLayer)
   }
   
+  
+  // MARK: - Layout
   internal func configureConstraints() {
     self.profileBackgroundView.snp_makeConstraints { (make) -> Void in
       make.top.equalTo(self.view).offset(60.0)
       make.left.equalTo(self.view).offset(22.0)
       make.right.equalTo(self.view).inset(22.0)
       make.bottom.equalTo(self.view).inset(60.0)
+    }
+    
+    self.profileTopSectionView.snp_makeConstraints { (make) -> Void in
+      make.top.left.right.equalTo(self.profileBackgroundView)
+      make.bottom.equalTo(self.profileBottomSectionView.snp_top)
     }
     
     self.profileBottomSectionView.snp_makeConstraints { (make) -> Void in
@@ -58,13 +76,15 @@ class ProfileViewController: UIViewController {
   
   internal func setupViewHierarchy() {
     self.view.addSubview(profileBackgroundView)
+    self.profileBackgroundView.addSubview(self.profileTopSectionView)
     self.profileBackgroundView.addSubview(self.profileBottomSectionView)
     self.profileBackgroundView.addSubview(self.followButton)
   }
   
+  
+  // MARK: - Lazy Instances
   lazy var profileBackgroundView: UIView = {
     let view: UIView = UIView()
-    view.backgroundColor = ConceptColors.LightBlue
     view.layer.cornerRadius = 12.0
     view.clipsToBounds = true
     return view
