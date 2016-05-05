@@ -174,14 +174,32 @@ internal class FollowButton: UIView {
   }
   
   internal func attachRotationAnimationToSpinner() {
-    
-    let rotationTransform = CGAffineTransformMakeRotation((CGFloat(180.0 * M_PI) / 180.0))
-    
-    UIView.animateWithDuration(0.55, delay: 0.2, options: [.CurveLinear], animations: { () -> Void in
-      self.spinnerImageView.layer.transform = CATransform3DMakeAffineTransform(rotationTransform)
+
+    UIView.animateKeyframesWithDuration(1.15, delay: 0.0, options: [.Repeat, .BeginFromCurrentState, .CalculationModePaced], animations: { () -> Void in
+      
+      UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.25, animations: { () -> Void in
+        self.spinnerImageView.layer.transform = CATransform3DMakeRotation(self.degreesToRad(90.0), 0.0, 0.0, -1.0)
+      })
+      
+      UIView.addKeyframeWithRelativeStartTime(0.25, relativeDuration: 0.20, animations: { () -> Void in
+        self.spinnerImageView.layer.transform = CATransform3DMakeRotation(self.degreesToRad(180.0), 0.0, 0.0, -1.0)
+      })
+      
+      UIView.addKeyframeWithRelativeStartTime(0.55, relativeDuration: 0.25, animations: { () -> Void in
+         self.spinnerImageView.layer.transform = CATransform3DMakeRotation(self.degreesToRad(270.0), 0.0, 0.0, -1.0)
+      })
+      
+      UIView.addKeyframeWithRelativeStartTime(0.75, relativeDuration: 0.25, animations: { () -> Void in
+        self.spinnerImageView.layer.transform = CATransform3DMakeRotation(self.degreesToRad(360.0), 0.0, 0.0, -1.0)
+      })
+      
       }) { (complete: Bool) -> Void in
     }
     
+  }
+  
+  internal func degreesToRad(degrees: CGFloat) -> CGFloat {
+    return degrees * (CGFloat(M_PI) / 180.0)
   }
   
   
