@@ -9,7 +9,7 @@
 import UIKit
 import SnapKit
 
-protocol FollowButtonDelegate: class {
+public protocol FollowButtonDelegate: class {
   func handleFollowButtonPress(action: (()->Void))
 }
 
@@ -23,10 +23,9 @@ public class FollowButton: UIView {
   
   // MARK: - Variables
   // ------------------------------------------------------------
-  internal var delegate: FollowButtonDelegate?
+  public var delegate: FollowButtonDelegate?
   private var currentState: FollowState = .NotFollowing
   private var loadingStateWidthConstraints: (left: Constraint?, right: Constraint?)
-  private var normalStateWidthConstraint: (left: Constraint?, right: Constraint?)
   
   
   // MARK: - Initialization
@@ -45,6 +44,7 @@ public class FollowButton: UIView {
   
   // MARK: - Layout Setup
   // ------------------------------------------------------------
+  // TODO: I dont like that I need to call this from the sender's viewWillAppear, figure out how to do this internally
   internal func updateCornerRadius() {
     self.layoutIfNeeded()
     
@@ -52,7 +52,7 @@ public class FollowButton: UIView {
     self.buttonView.layer.cornerRadius = currentHeight/2.0
   }
   
-  internal func configureConstraints() {
+  private func configureConstraints() {
     self.buttonView.snp_makeConstraints { (make) -> Void in
       make.top.bottom.centerX.equalTo(self)
       make.left.greaterThanOrEqualTo(self)
@@ -75,12 +75,14 @@ public class FollowButton: UIView {
     }
   }
   
-  internal func setupViewHierarchy() {
+  private func setupViewHierarchy() {
     self.addSubview(buttonView)
     self.buttonView.addSubview(buttonLabel)
     self.buttonView.addSubview(spinnerImageView)
   }
   
+  /** Used to update the UI state of the button and label
+   */
   private func updateButtonToState(state: FollowState) {
     switch state {
     case .NotFollowing:
@@ -171,6 +173,7 @@ public class FollowButton: UIView {
     }
   }
   
+  // TODO: these functions are a bit misleading, they dont just stretch/compress, they update state - should be renamed
   internal func attachStretchAnimationToButton() {
 
     self.loadingStateWidthConstraints.left?.activate()
@@ -188,14 +191,15 @@ public class FollowButton: UIView {
       
         self.layoutIfNeeded()
       }) { (complete: Bool) -> Void in
+        // TODO: consider having a block that can be set as a variable and executed here if needed
         if complete {
         }
     }
     
   }
   
-  internal func attachRotationAnimationToSpinner() {
-
+  private func attachRotationAnimationToSpinner() {
+    
     // annoyingly, it seems that it is necessary to split up the rotations into multiple animation calls
     UIView.animateKeyframesWithDuration(1.15, delay: 0.0, options: [.Repeat, .BeginFromCurrentState, .CalculationModePaced], animations: { () -> Void in
       
@@ -216,10 +220,14 @@ public class FollowButton: UIView {
       })
       
       }) { (complete: Bool) -> Void in
+        self.attachRotationAnimationToSpinner()
     }
     
   }
   
+  
+  // MARK: - Helpers
+  // ------------------------------------------------------------
   private func degreesToRad(degrees: CGFloat) -> CGFloat {
     return degrees * (CGFloat(M_PI) / 180.0)
   }
@@ -229,6 +237,8 @@ public class FollowButton: UIView {
   // ------------------------------------------------------------
   internal func followButtonTapped(sender: AnyObject?) {
     self.startButtonLoadingAnimation()
+    // TODO: adjust stretch/compress animation depending on its current state
+    // TODO: delegate will need to signal that animation should begin/end
   }
   
   internal func followButtonHighlighted(sender: AnyObject?) {
