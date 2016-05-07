@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let profileViewController: ProfileViewController = ProfileViewController()
     self.window?.rootViewController = profileViewController
     
+    FireBaseManager.sharedManager.createTestUsers()
     self.window?.makeKeyAndVisible()
     
     return true
