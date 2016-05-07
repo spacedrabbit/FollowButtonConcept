@@ -19,7 +19,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let profileViewController: ProfileViewController = ProfileViewController()
     self.window?.rootViewController = profileViewController
     
-    FireBaseManager.sharedManager.createTestUsers()
+//    FireBaseManager.sharedManager.createTestUsers()
+    FireBaseManager.sharedManager.updateSpecificTestUser("Louis3667613670Tur3876357058")
     self.window?.makeKeyAndVisible()
     
     return true

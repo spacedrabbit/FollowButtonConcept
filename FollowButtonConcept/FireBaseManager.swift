@@ -19,6 +19,7 @@ internal struct Keys {
   internal static let UserName: String = "username"
   internal static let FirstName: String = "first_name"
   internal static let LastName: String = "last_name"
+  internal static let Nickname: String = "nickname"
 }
 
 internal class FireBaseManager {
@@ -42,7 +43,14 @@ internal class FireBaseManager {
     let newUser: [String : AnyObject] = [testUsername : [Keys.FirstName : testUserFirst, Keys.LastName : testUserLast]]
     
     let userRef = self.firebaseReference.childByAppendingPath(Paths.DataNode + Paths.UsersNode)
-    userRef.setValue(newUser)
+    //    userRef.setValue(newUser) // completely overwrites the /data/user node with new value
+    userRef.updateChildValues(newUser) // updates the /data/user note by adding a new value
+  }
+  
+  internal func updateSpecificTestUser(user: String) {
+    let userRef = self.firebaseReference.childByAppendingPath(Paths.DataNode + Paths.UsersNode + "/" + user)
+    let testUserNick: String = "Eagle" + "\(arc4random_uniform(UInt32.max))"
+    userRef.updateChildValues([Keys.Nickname : testUserNick])
   }
   
   internal func writeKey(key: String, value: String) {
