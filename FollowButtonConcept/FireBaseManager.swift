@@ -36,11 +36,16 @@ internal class FireBaseManager {
   
   internal func createTestUsers() {
     
-    let testUserFirst: String = "Louis" + "\(arc4random_uniform(UInt32.max))"
-    let testUserLast: String = "Tur" + "\(arc4random_uniform(UInt32.max))"
+    let testUserFirst: String = "Louis" + "\(randomInt())"
+    let testUserLast: String = "Tur" + "\(randomInt())"
     let testUsername: String = testUserFirst + testUserLast
     
-    let newUser: [String : AnyObject] = [testUsername : [Keys.FirstName : testUserFirst, Keys.LastName : testUserLast]]
+    let newUser: [String : AnyObject] = [
+      testUsername : [
+        Keys.FirstName : testUserFirst,
+        Keys.LastName : testUserLast
+      ]
+    ]
     
     let userRef = self.firebaseReference.childByAppendingPath(Paths.DataNode + Paths.UsersNode)
     //    userRef.setValue(newUser) // completely overwrites the /data/user node with new value
@@ -49,11 +54,15 @@ internal class FireBaseManager {
   
   internal func updateSpecificTestUser(user: String) {
     let userRef = self.firebaseReference.childByAppendingPath(Paths.DataNode + Paths.UsersNode + "/" + user)
-    let testUserNick: String = "Eagle" + "\(arc4random_uniform(UInt32.max))"
+    let testUserNick: String = "Eagle" + "\(randomInt())"
     userRef.updateChildValues([Keys.Nickname : testUserNick])
   }
   
   internal func writeKey(key: String, value: String) {
 //    self.firebaseReference.setVa
+  }
+  
+  private func randomInt() -> UInt32 {
+    return arc4random_uniform(UInt32.max)
   }
 }
