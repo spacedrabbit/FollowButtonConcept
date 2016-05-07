@@ -6,6 +6,7 @@ use_frameworks!
 target 'FollowButtonConcept' do
 
 pod 'SnapKit' , '~> 0.19.0'
+pod 'Firebase', '>= 2.5.1'
 
 end
 
