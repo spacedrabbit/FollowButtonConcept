@@ -13,13 +13,21 @@ protocol FollowButtonDelegate: class {
   func handleFollowButtonPress(action: (()->Void))
 }
 
-internal class FollowButton: UIView {
+public class FollowButton: UIView {
+  
+  private enum FollowState {
+    case NotFollowing
+    case Following
+  }
 
+  
   // MARK: - Variables
   // ------------------------------------------------------------
   internal var delegate: FollowButtonDelegate?
+  private var currentState: FollowState = .NotFollowing
   private var loadingStateWidthConstraints: (left: Constraint?, right: Constraint?)
   private var normalStateWidthConstraint: (left: Constraint?, right: Constraint?)
+  
   
   // MARK: - Initialization
   // ------------------------------------------------------------
@@ -30,7 +38,7 @@ internal class FollowButton: UIView {
     self.configureConstraints()
   }
   
-  required init?(coder aDecoder: NSCoder) {
+  required public init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
   }
 
@@ -52,11 +60,13 @@ internal class FollowButton: UIView {
     }
     
     self.buttonLabel.snp_makeConstraints { (make) -> Void in
+      // pads the top and bottom of the label by expanding the superview
       make.top.equalTo(buttonView).offset(14.0)
       make.bottom.equalTo(buttonView).inset(14.0)
-      let right: Constraint = make.right.equalTo(buttonView).inset(48.0).constraint
-      let left: Constraint = make.left.equalTo(buttonView).offset(48.0).constraint
-      self.loadingStateWidthConstraints = (left, right)
+      make.center.equalTo(buttonView).priorityRequired()
+      
+      self.loadingStateWidthConstraints.right = make.right.equalTo(buttonView).inset(48.0).constraint
+      self.loadingStateWidthConstraints.left = make.left.equalTo(buttonView).offset(48.0).constraint
     }
     
     self.spinnerImageView.snp_makeConstraints { (make) -> Void in
@@ -71,6 +81,19 @@ internal class FollowButton: UIView {
     self.buttonView.addSubview(spinnerImageView)
   }
   
+  private func updateButtonToState(state: FollowState) {
+    switch state {
+    case .NotFollowing:
+      self.buttonLabel.text = "F O L L O W"
+      self.buttonView.backgroundColor = ConceptColors.OffWhite
+      self.buttonLabel.textColor = ConceptColors.DarkText
+      
+    case .Following:
+      self.buttonLabel.text = "F O L L O W I N G"
+      self.buttonView.backgroundColor = ConceptColors.MediumBlue
+      self.buttonLabel.textColor = ConceptColors.OffWhite
+    }
+  }
   
   // MARK: - Lazy Instances
   // ------------------------------------------------------------
@@ -94,8 +117,8 @@ internal class FollowButton: UIView {
     return label
   }()
   
-  lazy var spinnerImageView: UIImageView = {
-    let imageView: UIImageView = UIImageView(image: UIImage(named: "thick_spinner"))
+  internal lazy var spinnerImageView: UIImageView = {
+    let imageView: UIImageView = UIImageView(image: UIImage(named: "squareSpinner"))
     imageView.contentMode = .ScaleAspectFit
     imageView.alpha = 0.0
     return imageView
@@ -104,15 +127,25 @@ internal class FollowButton: UIView {
   
   // MARK: - Animations
   // ------------------------------------------------------------
+  public func setLoadingState(isLoading: Bool) {
+    if isLoading {
+      self.attachRotationAnimationToSpinner()
+    }
+    else {
+      self.stopAnimatingSpinner()
+    }
+  }
+  
+  private func stopAnimatingSpinner() {
+    self.spinnerImageView.layer.removeAllAnimations()
+  }
+  
   private func startButtonLoadingAnimation() {
+    self.userInteractionEnabled = false
     
     let currentHeight: CGFloat = self.frame.size.height
     self.loadingStateWidthConstraints.left?.deactivate()
     self.loadingStateWidthConstraints.right?.deactivate()
-    
-    self.buttonLabel.snp_makeConstraints { (make) -> Void in
-      make.center.equalTo(self.buttonView).priorityRequired()
-    }
     
     self.buttonView.snp_updateConstraints { (make) -> Void in
       make.width.greaterThanOrEqualTo(currentHeight)
@@ -133,41 +166,29 @@ internal class FollowButton: UIView {
       self.layoutIfNeeded()
       }) { (complete: Bool) -> Void in
         if complete {
-          self.startReverseTimer()
-          self.attachRotationAnimationToSpinner()
+          self.setLoadingState(true)
         }
     }
   }
   
-  private func startReverseTimer() {
-    let aLittleLater: NSDate = NSDate(timeIntervalSinceNow: 2.2)
-    let timer: NSTimer = NSTimer(fireDate: aLittleLater, interval: 0.0, target: self, selector: "attachStretchAnimationToButton", userInfo: nil, repeats: false)
-    let timerRunLoop: NSRunLoop = NSRunLoop.currentRunLoop()
-    timerRunLoop.addTimer(timer, forMode: NSDefaultRunLoopMode)
-  }
-  
   internal func attachStretchAnimationToButton() {
-    self.buttonLabel.text = "F O L L O W I N G"
 
     self.loadingStateWidthConstraints.left?.activate()
     self.loadingStateWidthConstraints.right?.activate()
     UIView.animateKeyframesWithDuration(0.25, delay: 0.0, options: [], animations: { () -> Void in
       
       self.buttonLabel.alpha = 0.0
-      UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.3, animations: { () -> Void in
-        self.buttonLabel.alpha = 1.0
-        self.buttonView.backgroundColor = ConceptColors.MediumBlue
-        self.buttonLabel.textColor = ConceptColors.OffWhite
-      })
+      self.setLoadingState(false)
       
-      UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.2, animations: { () -> Void in
+      UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.3, animations: { () -> Void in
+        self.updateButtonToState(.Following)
+        self.buttonLabel.alpha = 1.0
         self.spinnerImageView.alpha = 0.0
       })
       
         self.layoutIfNeeded()
       }) { (complete: Bool) -> Void in
         if complete {
-          
         }
     }
     
@@ -175,6 +196,7 @@ internal class FollowButton: UIView {
   
   internal func attachRotationAnimationToSpinner() {
 
+    // annoyingly, it seems that it is necessary to split up the rotations into multiple animation calls
     UIView.animateKeyframesWithDuration(1.15, delay: 0.0, options: [.Repeat, .BeginFromCurrentState, .CalculationModePaced], animations: { () -> Void in
       
       UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.25, animations: { () -> Void in
@@ -185,7 +207,7 @@ internal class FollowButton: UIView {
         self.spinnerImageView.layer.transform = CATransform3DMakeRotation(self.degreesToRad(180.0), 0.0, 0.0, -1.0)
       })
       
-      UIView.addKeyframeWithRelativeStartTime(0.55, relativeDuration: 0.25, animations: { () -> Void in
+      UIView.addKeyframeWithRelativeStartTime(0.55, relativeDuration: 0.30, animations: { () -> Void in
          self.spinnerImageView.layer.transform = CATransform3DMakeRotation(self.degreesToRad(270.0), 0.0, 0.0, -1.0)
       })
       
@@ -198,7 +220,7 @@ internal class FollowButton: UIView {
     
   }
   
-  internal func degreesToRad(degrees: CGFloat) -> CGFloat {
+  private func degreesToRad(degrees: CGFloat) -> CGFloat {
     return degrees * (CGFloat(M_PI) / 180.0)
   }
   
@@ -206,18 +228,24 @@ internal class FollowButton: UIView {
   // MARK: - Button Control Actions
   // ------------------------------------------------------------
   internal func followButtonTapped(sender: AnyObject?) {
-    print("follow button tapped")
-    self.buttonLabel.textColor = ConceptColors.DarkText
-    
     self.startButtonLoadingAnimation()
   }
   
   internal func followButtonHighlighted(sender: AnyObject?) {
-    self.buttonLabel.textColor = ConceptColors.MediumBlue
+    if self.currentState == .NotFollowing {
+      self.buttonLabel.textColor = ConceptColors.MediumBlue
+    } else {
+      self.buttonLabel.textColor = ConceptColors.DarkText
+    }
   }
   
   internal func followButtonReleased(sender: AnyObject?) {
-    self.buttonLabel.textColor = ConceptColors.DarkText
+    if self.currentState == .Following {
+      self.buttonLabel.textColor = ConceptColors.DarkText
+    } else {
+      self.buttonLabel.textColor = ConceptColors.MediumBlue
+    }
+    
   }
   
 }
