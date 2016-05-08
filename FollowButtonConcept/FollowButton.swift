@@ -26,6 +26,7 @@ public class FollowButton: UIView {
   public var delegate: FollowButtonDelegate?
   private var currentState: FollowState = .NotFollowing
   private var loadingStateWidthConstraints: (left: Constraint?, right: Constraint?)
+  private var minButtonWidth: CGFloat?
   
   
   // MARK: - Initialization
@@ -145,12 +146,12 @@ public class FollowButton: UIView {
   private func startButtonLoadingAnimation() {
     self.userInteractionEnabled = false
     
-    let currentHeight: CGFloat = self.frame.size.height
+    self.minButtonWidth = self.frame.size.height
     self.loadingStateWidthConstraints.left?.deactivate()
     self.loadingStateWidthConstraints.right?.deactivate()
     
     self.buttonView.snp_updateConstraints { (make) -> Void in
-      make.width.greaterThanOrEqualTo(currentHeight)
+      make.width.greaterThanOrEqualTo(self.minButtonWidth!)
     }
     
     UIView.animateKeyframesWithDuration(0.40, delay: 0.0, options: [], animations: { () -> Void in

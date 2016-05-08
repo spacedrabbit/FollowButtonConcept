@@ -20,6 +20,9 @@ internal struct Keys {
   internal static let FirstName: String = "first_name"
   internal static let LastName: String = "last_name"
   internal static let Nickname: String = "nickname"
+  internal static let Email: String = "email"
+  internal static let Followers: String = "followers"
+  internal static let Following: String = "following"
 }
 
 internal class FireBaseManager {
@@ -52,14 +55,65 @@ internal class FireBaseManager {
     userRef.updateChildValues(newUser) // updates the /data/user note by adding a new value
   }
   
-  internal func updateSpecificTestUser(user: String) {
-    let userRef = self.firebaseReference.childByAppendingPath(Paths.DataNode + Paths.UsersNode + "/" + user)
-    let testUserNick: String = "Eagle" + "\(randomInt())"
-    userRef.updateChildValues([Keys.Nickname : testUserNick])
+  internal func newUser(user user: PosseUser, completion: (success: Bool)->Void) {
+    let ref = FireBaseManager.sharedManager.firebaseReference
+    
+    ref.createUser(user.emailAddress, password: "posse",
+      withValueCompletionBlock: { (error: NSError?, result: [NSObject : AnyObject]?) in
+        
+        if error != nil {
+          print("Error encountered on creating a user account: \(error!.description)")
+          completion(success: false)
+        } else {
+          let uid: String? = result?["uid"] as? String
+          print("Successfully created user account with uid: \(uid)")
+          completion(success: true)
+        }
+    })
   }
   
-  internal func writeKey(key: String, value: String) {
-//    self.firebaseReference.setVa
+  internal func loginUser(email: String, password: String, completion: (success: Bool) -> Void) {
+    let ref = FireBaseManager.sharedManager.firebaseReference
+    ref.authUser(email, password: password,
+      withCompletionBlock: { (error: NSError?, authData: FAuthData?) in
+        
+        if error != nil {
+          print("Error encountered on logging in: \(error!.description)")
+          completion(success: false)
+        } else {
+          print("User has been logged in successfully")
+          completion(success: true)
+        }
+    })
+  }
+  
+  internal func updateUser(user: PosseUser) {
+    let userRef = self.firebaseReference.childByAppendingPath(Paths.DataNode + Paths.UsersNode + "/" + user.username)
+    let updateJson: [String : AnyObject] = user.toJson()
+    
+    userRef.updateChildValues(updateJson) { (error: NSError?, fireBaseRef: Firebase!) -> Void in
+      if error != nil {
+        print("Error encountered on user update: \(error!.description)")
+      }
+      else {
+        print("User updated")
+      }
+    
+    }
+  }
+  
+  internal func deleteUser(user: PosseUser) {
+    let ref = FireBaseManager.sharedManager.firebaseReference
+    
+    ref.removeUser(user.emailAddress, password: "posse",
+      withCompletionBlock: { error in
+        
+        if error != nil {
+          print("Error encountered on deleting a user: \(error!.description)")
+        } else {
+          print("User successfully deleted")
+        }
+    })
   }
   
   private func randomInt() -> UInt32 {
