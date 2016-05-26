@@ -19,17 +19,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let profileViewController: ProfileViewController = ProfileViewController()
     self.window?.rootViewController = profileViewController
     
-    let newUser: PosseUser = PosseUser(firstName: "Louis", lastName: "Tur", emailAddress: "louis.tur@gmail.com", username: "louistur", imageURL: "")
-    FireBaseManager.sharedManager.newUser(user: newUser) { (success) -> Void in
-      if success {
-        FireBaseManager.sharedManager.loginUser(newUser.emailAddress, password: "posse") { (success: Bool) in
-          if success {
-            FireBaseManager.sharedManager.deleteUser(newUser)
-          }
-        }
-      }
-    }
-    
     self.window?.makeKeyAndVisible()
     
     return true
